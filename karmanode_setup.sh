@@ -77,7 +77,7 @@ function system_upgrade () {
 	apt-get -y update
 	apt-get -y upgrade
 	apt-get -y install pkg-config
-	apt-get -y install build-essential autoconf automake libtool libboost-all-dev libgmp-dev libssl-dev libcurl4-openssl-dev git
+	apt-get -y install build-essential autoconf automake libtool libboost-all-dev libgmp-dev libssl-dev libcurl4-openssl-dev git unzip wget
 	apt-get -y install libdb4.8-dev libdb4.8++-dev
 
 }
@@ -122,6 +122,32 @@ function create_swap_space () {
 
 }
 
+function compile_ohm_daemon () {
+
+    su -c "cd; git clone https://github.com/theohmproject/ohmcoin.git" $KARMANODE_USER
+    su -c "cd ~/ohmcoin; chmod +x share/genbuild.sh; chmod +x autogen.sh" $KARMANODE_USER
+    su -c "cd ~/ohmcoin; chmod 755 src/leveldb/build_detect_platform" $KARMANODE_USER
+    su -c "cd ~/ohmcoin; ./autogen.sh" $KARMANODE_USER
+    su -c "cd ~/ohmcoin; ./configure" $KARMANODE_USER
+    su -c "cd ~/ohmcoin; sudo make" $KARMANODE_USER
+    su -c "cd ~/ohmcoin; sudo make install" $KARMANODE_USER
+    su -c "mkdir ~/.ohmc" $KARMANODE_USER
+
+#Testing
+
+    su -c "echo \"rpcuser=$KARMANODE_RPC_USER\" > ~/.ohmc/ohmc.conf" $KARMANODE_USER
+    su -c "echo \"rpcpassword=$KARMANODE_RPC_PASS\" >> ~/.ohmc/ohmc.conf" $KARMANODE_USER
+
+}
+
+function installing_blockchain () {
+
+    su -c "cd ~/.ohmc; wget http://www.ohmcoin.org/downloads/OHMC_Blockchain_snapshot.zip" $KARMANODE_USER
+    su -c "cd ~/.ohmc; unzip OHMC_Blockchain_snapshot.zip" $KARMANODE_USER
+    su -c "cd ~/.ohmc; rm OHMC_Blockchain_snapshot.zip" $KARMANODE_USER
+
+}
+
 gather_user_info
 check_info
 
@@ -137,25 +163,13 @@ modify_sshd_config
 echo "--- Creating swap partition..."
 create_swap_space
 
-echo "Installing ohmc daemon..."
-
-su -c "cd; git clone https://github.com/theohmproject/ohmcoin.git" $KARMANODE_USER
-su -c "cd ~/ohmcoin; chmod +x share/genbuild.sh" $KARMANODE_USER
-su -c "cd ~/ohmcoin; chmod +x autogen.sh" $KARMANODE_USER
-su -c "cd ~/ohmcoin; chmod 755 src/leveldb/build_detect_platform" $KARMANODE_USER
-
-#sudo ./autogen.sh 
-#sudo ./configure
-#sudo make
-#sudo make install
+echo "--- Installing and configuring ohmc daemon..."
+compile_ohm_daemon
 
 echo "Installing blockchain snapshot..."
+installing_blockchain
 
-echo "Configuring ohmc daemon..."
-
-#mkdir ~/.ohmc/ && touch ~/.ohmc/ohmc.conf
-#echo "rpcuser=any_user" >> ~/.ohmc/ohmc.conf
-#echo "rpcpassword=any_password" >> ~/.ohmc/ohmc.conf
+echo "Starting ohmc daemon..."
 
 #cd ~/.ohmc
 #ohmcd -daemon
