@@ -88,6 +88,8 @@ function user_creation () {
 	passwd $KARMANODE_USER
 	echo "Granting sudo privileges..."
 	adduser $KARMANODE_USER sudo
+    echo "Granting make without password..."
+    echo '$KARMANODE_USER ALL = NOPASSWD: /usr/bin/make' | sudo EDITOR='tee -a' visudo
 
 }
 
@@ -132,9 +134,6 @@ function compile_ohm_daemon () {
     su -c "cd ~/ohmcoin; sudo make" $KARMANODE_USER
     su -c "cd ~/ohmcoin; sudo make install" $KARMANODE_USER
     su -c "mkdir ~/.ohmc" $KARMANODE_USER
-
-#Testing
-
     su -c "echo \"rpcuser=$KARMANODE_RPC_USER\" > ~/.ohmc/ohmc.conf" $KARMANODE_USER
     su -c "echo \"rpcpassword=$KARMANODE_RPC_PASS\" >> ~/.ohmc/ohmc.conf" $KARMANODE_USER
 
