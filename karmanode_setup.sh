@@ -102,7 +102,7 @@ function modify_sshd_config () {
 function create_swap_space () {
 
 	if [ ! -f /swapfile ]; then
-    	fallocate -l 2G /swapfile
+    	fallocate -l 3G /swapfile
 		chmod 600 /swapfile
 		mkswap /swapfile
 		swapon /swapfile
