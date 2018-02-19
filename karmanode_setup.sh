@@ -144,12 +144,6 @@ function start_daemon () {
 
 }
 
-function waiting_sync () {
-
-    su -c "ohmc-cli getinfo | grep blocks" $KARMANODE_USE
-
-}
-
 function configure_daemon () {
 
     su -c "echo rpcallowip=127.0.0.1 | tee -a ~/.ohmc/ohmc.conf" $KARMANODE_USER
@@ -198,28 +192,17 @@ echo ""
 installing_blockchain
 
 echo ""
-echo "--- Starting ohmc daemon..."
-echo ""
-start_daemon
-
-echo ""
-echo "--- Please wait daemon to get synced..."
-echo ""
-SYNCED=n
-while [ $SYNCED == "n" ]; do
-    waiting_sync
-    read -p "It is the daemon synced? [y/n]: " SYNCED
-done
-echo "Daemon synced"
-
-echo ""
 echo "--- Applying following daemon configuration..."
 echo ""
 configure_daemon
 
 echo ""
-echo "--- Karmanode setup finished, system is going to be restarted in one minute"
-echo "--- Remember to restart the daemon with the following command on user $KARMANODE_USER"
-echo "--- cd ~/.ohmc; ohmcd -daemon"
+echo "--- Starting ohmc daemon..."
 echo ""
-shutdown -r +1
+start_daemon
+
+echo ""
+echo "--- Karmanode setup finished."
+echo "--- You can check the syncing progress by running ohmc-cli getinfo"
+echo ""
+ohmc-cli getinfo
