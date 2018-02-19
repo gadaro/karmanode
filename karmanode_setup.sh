@@ -78,7 +78,7 @@ function user_creation () {
 	echo "Granting sudo privileges..."
 	adduser $KARMANODE_USER sudo
     echo "Granting make without password..."
-    echo '$KARMANODE_USER ALL = NOPASSWD: /usr/bin/make' | sudo EDITOR='tee -a' visudo
+    echo "$KARMANODE_USER ALL = NOPASSWD: /usr/bin/make" | sudo EDITOR='tee -a' visudo
 
 }
 
