@@ -205,4 +205,4 @@ echo ""
 echo "--- Karmanode setup finished."
 echo "--- You can check the syncing progress by running ohmc-cli getinfo"
 echo ""
-ohmc-cli getinfo
+su -c "ohmc-cli getinfo" $KARMANODE_USER
